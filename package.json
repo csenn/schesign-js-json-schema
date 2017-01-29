@@ -5,7 +5,7 @@
   "description": "Generate a json schema from a schesign graph",
   "repository": {
     "type": "git",
-    "url": "https://github.com/deiucanta/npm-starter.git"
+    "url": "https://github.com/csenn/schesign-json-schema.git"
   },
   "main": "index.js",
   "scripts": {
