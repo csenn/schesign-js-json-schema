@@ -24,6 +24,11 @@ export const NUMBER_INT_32 = 'Int32';
 export const NUMBER_INT_64 = 'Int64';
 
 
+export function reduceUrl(url) {
+  return url.substring(url.indexOf('schesign.com'));
+}
+
+
 export function isNumber(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }

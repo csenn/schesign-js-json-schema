@@ -39,11 +39,11 @@
          }
        }
     },
-    "x": { "$ref": "#/definitions/class2" }
+    "x": { "$ref": "#/definitions/www.schesign.com/o/tests/test_property_variations/master/class/class2" }
   },
   "required": ["b"],
   "definitions": {
-    "class2": {
+    "www.schesign.com/o/tests/test_property_variations/master/class/class2": {
       "type": "object",
       "properties": {
         "y": { "type": "string" }

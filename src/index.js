@@ -66,7 +66,7 @@ function _fromDateRange(range) {
 
 function _fromLinkedClassRange(context, range) {
   const rangeClass = context.classCache[range.ref];
-  const keyName = rangeClass.uid;
+  const keyName = rangeClass.uid.replace('https://', '');
 
   if (!context.definitions[keyName]) {
     context.definitions[keyName] = _fromObjectSchema(context, rangeClass.propertyRefs);
