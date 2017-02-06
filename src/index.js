@@ -124,6 +124,33 @@ export function _createSchemaFromRange(context, range) {
   }
 }
 
+function existsInRefs(context, propertyRefs, parentRef) {
+  return propertyRefs.some(ref => {
+    const node = context.propertyCache[ref.ref];
+    const parentNode = context.propertyCache[parentRef.ref];
+    return node.label === parentNode.label;
+  });
+}
+
+export function _flattenHierarchies(context) {
+  Object.keys(context.classCache).forEach(key => {
+    const classNode = context.classCache[key];
+    const recurseNode = node => {
+      if (node.subClassOf) {
+        const parent = context.classCache[node.subClassOf];
+        parent.propertyRefs.forEach(parentRef => {
+          const exists = existsInRefs(context, classNode.propertyRefs, parentRef);
+          if (!exists) {
+            classNode.propertyRefs.push(parentRef);
+          }
+        });
+        recurseNode(parent);
+      }
+    };
+    recurseNode(classNode);
+  });
+}
+
 /*
   Entry point. Provide the graph, the classId, and options
 */
@@ -143,6 +170,8 @@ export function generateFromClass(graph, classId, options = {}) {
       context.propertyCache[node.uid] = node;
     }
   });
+
+  _flattenHierarchies(context);
 
   const currentClass = context.classCache[classId];
 

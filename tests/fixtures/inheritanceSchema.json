@@ -1,0 +1,12 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "properties": {
+      "a": {  "type": "string" },
+      "a1": {  "type": "string" },
+      "b": {  "type": "string" },
+      "c": {  "type": "string" },
+      "d": {  "type": "string" },
+      "e": {  "type": "string" }
+    },
+    "type": "object"
+}

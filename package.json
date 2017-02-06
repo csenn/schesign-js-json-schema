@@ -1,11 +1,11 @@
 {
-  "name": "schesign-json-schema",
-  "version": "1.0.0",
+  "name": "schesign-js-json-schema",
+  "version": "0.1.0",
   "license": "MIT",
   "description": "Generate a json schema from a schesign graph",
   "repository": {
     "type": "git",
-    "url": "https://github.com/csenn/schesign-json-schema.git"
+    "url": "https://github.com/csenn/schesign-js-json-schema.git"
   },
   "main": "index.js",
   "scripts": {
