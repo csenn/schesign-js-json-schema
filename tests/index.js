@@ -10,6 +10,9 @@ import inheritance from './fixtures/inheritance.json';
 import inheritanceSchema from './fixtures/inheritanceSchema.json';
 import inheritanceOverride from './fixtures/inheritanceOverride.json';
 import inheritanceOverrideSchema from './fixtures/inheritanceOverrideSchema.json';
+import excludeParent from './fixtures/excludeParent';
+import excludeParentSchema from './fixtures/excludeParentSchema'
+
 
 describe('generateJsonSchema', () => {
   it('should convert simple to a json schema', () => {
@@ -34,6 +37,14 @@ describe('generateJsonSchema', () => {
       'https://www.schesign.com/u/csenn/test_inheritance_2/master/class/class5'
     );
     expect(schema).to.deep.equal(inheritanceSchema);
+  });
+
+  it('should convert excludeParent to a json schema', () => {
+    const schema = generateFromClass(
+      excludeParent.graph,
+      'https://www.schesign.com/u/my_user/my_design/0.0.1/class/class2'
+    );
+    expect(schema).to.deep.equal(excludeParentSchema);
   });
 
   it('should convert inheritanceOverride to a json schema', () => {

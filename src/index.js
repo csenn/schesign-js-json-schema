@@ -124,6 +124,8 @@ export function _createSchemaFromRange(context, range) {
   }
 }
 
+/* If there is a property label lower in the hierarchy,
+do not overwrite it from parent with same name */
 function existsInRefs(context, propertyRefs, parentRef) {
   return propertyRefs.some(ref => {
     const node = context.propertyCache[ref.ref];
@@ -139,8 +141,10 @@ export function _flattenHierarchies(context) {
       if (node.subClassOf) {
         const parent = context.classCache[node.subClassOf];
         parent.propertyRefs.forEach(parentRef => {
-          const exists = existsInRefs(context, classNode.propertyRefs, parentRef);
-          if (!exists) {
+          const exclude = classNode.excludeParentProperties
+            && classNode.excludeParentProperties.includes(parentRef.ref)
+          const exists = existsInRefs(context, classNode.propertyRefs, parentRef)
+          if (!exclude && !exists) {
             classNode.propertyRefs.push(parentRef);
           }
         });

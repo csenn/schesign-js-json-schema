@@ -6,7 +6,7 @@ This library converts this graph into JSON schema.
 
 ### Install
 ```
-npm install schesign-js-json-schema
+npm install schesign-js-json-schema --save
 ```
 
 ## Examples
@@ -92,10 +92,7 @@ console.log(uid);
 var options = { uid: uid };
 
 fetchGraph(options).then(json => {
-  const schema = generateFromClass(
-    json.graph,
-    'https://www.schesign.com/u/my_user/my_design/0.0.1/class/class1'
-  )
+  const schema = generateFromClass(json.graph, uid)
   console.log(schema)
 }).catch(err => {
   console.log(err);
