@@ -76,10 +76,8 @@ function _fromLinkedClassRange(context, range) {
 }
 
 export function _fromObjectSchema(context, propertyRefs) {
-  const constraint = {
-    type: 'object',
-    required: [],
-  };
+  const constraint = { type: 'object' };
+  const required = [];
 
   constraint.properties = propertyRefs.reduce((prev, propertyRef) => {
     const property = context.propertyCache[propertyRef.ref];
@@ -87,7 +85,7 @@ export function _fromObjectSchema(context, propertyRefs) {
     const childConstraint = _createSchemaFromRange(context, range);
 
     if (utils.isRequiredCardinality(propertyRef.cardinality)) {
-      constraint.required.push(label);
+      required.push(label);
     }
 
     const isArray = utils.isMultipleCardinality(propertyRef.cardinality);
@@ -96,8 +94,8 @@ export function _fromObjectSchema(context, propertyRefs) {
     });
   }, {});
 
-  if (constraint.required.length === 0) {
-    delete constraint.required;
+  if (required.length > 0) {
+    constraint.required = required;
   }
 
   return constraint;
@@ -142,8 +140,8 @@ export function _flattenHierarchies(context) {
         const parent = context.classCache[node.subClassOf];
         parent.propertyRefs.forEach(parentRef => {
           const exclude = classNode.excludeParentProperties
-            && classNode.excludeParentProperties.includes(parentRef.ref)
-          const exists = existsInRefs(context, classNode.propertyRefs, parentRef)
+            && classNode.excludeParentProperties.includes(parentRef.ref);
+          const exists = existsInRefs(context, classNode.propertyRefs, parentRef);
           if (!exclude && !exists) {
             classNode.propertyRefs.push(parentRef);
           }
@@ -179,11 +177,12 @@ export function generateFromClass(graph, classId, options = {}) {
 
   const currentClass = context.classCache[classId];
 
-  /* Create top level object schema */
-  const schema = _fromObjectSchema(context, currentClass.propertyRefs, context.schema);
+  /* Merge defaults with top level object contraint */
+  const schema = Object.assign({
+    $schema: 'http://json-schema.org/draft-04/schema#',
+  }, _fromObjectSchema(context, currentClass.propertyRefs, context.schema));
 
   /* Add meta and definitions (if there are any) */
-  schema.$schema = 'http://json-schema.org/draft-04/schema#';
   if (Object.keys(context.definitions).length) {
     schema.definitions = context.definitions;
   }
