@@ -27,18 +27,7 @@
     "s1": { "type": "string" },
     "s2": { "type": "string", "format": "date-time" },
     "s3": { "type": "string" },
-    "t": {
-       "type": "object",
-       "properties": {
-         "u": { "type": "string" },
-         "v": {
-           "type": "object",
-           "properties": {
-             "w": { "type": "string" }
-           }
-         }
-       }
-    },
+    "t": { "$ref": "#/definitions/www.schesign.com/o/tests/test_property_variations/master/property/t" },
     "x": { "$ref": "#/definitions/www.schesign.com/o/tests/test_property_variations/master/class/class2" }
   },
   "required": ["b"],
@@ -47,6 +36,19 @@
       "type": "object",
       "properties": {
         "y": { "type": "string" }
+      }
+    },
+    "www.schesign.com/o/tests/test_property_variations/master/property/t": {
+      "type": "object",
+      "properties": {
+        "u": { "type": "string" },
+        "v": { "$ref": "#/definitions/www.schesign.com/o/tests/test_property_variations/master/property/v" }
+      }
+    },
+    "www.schesign.com/o/tests/test_property_variations/master/property/v": {
+      "type": "object",
+      "properties": {
+        "w": { "type": "string" }
       }
     }
   }

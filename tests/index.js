@@ -11,8 +11,10 @@ import inheritanceSchema from './fixtures/inheritanceSchema.json';
 import inheritanceOverride from './fixtures/inheritanceOverride.json';
 import inheritanceOverrideSchema from './fixtures/inheritanceOverrideSchema.json';
 import excludeParent from './fixtures/excludeParent';
-import excludeParentSchema from './fixtures/excludeParentSchema'
-
+import excludeParentSchema from './fixtures/excludeParentSchema';
+import recursive from './fixtures/recursive';
+import recursiveSchema from './fixtures/recursiveSchema';
+import schemaDotOrg from './fixtures/schemaDotOrg';
 
 describe('generateJsonSchema', () => {
   it('should convert simple to a json schema', () => {
@@ -53,5 +55,23 @@ describe('generateJsonSchema', () => {
       'https://www.schesign.com/u/csenn/test_inheritance_override_1/master/class/class1'
     );
     expect(schema).to.deep.equal(inheritanceOverrideSchema);
+  });
+
+  it('should convert recursive to a json schema', () => {
+    const schema = generateFromClass(
+      recursive.graph,
+      'https://www.schesign.com/o/tests/recursive/master/class/class1'
+    );
+    expect(schema).to.deep.equal(recursiveSchema);
+    // expect(schema).to.deep.equal(inheritanceOverrideSchema);
+  });
+
+  it.skip('should convert schemaDotOrg to a json schema', () => {
+    const schema = generateFromClass(
+      schemaDotOrg.graph,
+      'https://www.schesign.com/u/csenn/schemadotorg/master/class/person'
+    );
+    console.log(JSON.stringify(schema, null, 2));
+    // expect(schema).to.deep.equal(inheritanceOverrideSchema);
   });
 });

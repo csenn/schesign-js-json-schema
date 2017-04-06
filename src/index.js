@@ -64,25 +64,15 @@ function _fromDateRange(range) {
   return constraint;
 }
 
-function _fromLinkedClassRange(context, range) {
-  const rangeClass = context.classCache[range.ref];
-  const keyName = rangeClass.uid.replace('https://', '');
 
-  if (!context.definitions[keyName]) {
-    context.definitions[keyName] = _fromObjectSchema(context, rangeClass.propertyRefs);
-  }
-
-  return { $ref: `#/definitions/${keyName}` };
-}
-
-export function _fromObjectSchema(context, propertyRefs) {
+export function _buildObjectSchema(context, propertyRefs) {
   const constraint = { type: 'object' };
   const required = [];
 
   constraint.properties = propertyRefs.reduce((prev, propertyRef) => {
     const property = context.propertyCache[propertyRef.ref];
-    const { label, range } = property;
-    const childConstraint = _createSchemaFromRange(context, range);
+    const { label } = property;
+    const childConstraint = _createSchemaFromRange(context, property);
 
     if (utils.isRequiredCardinality(propertyRef.cardinality)) {
       required.push(label);
@@ -101,7 +91,25 @@ export function _fromObjectSchema(context, propertyRefs) {
   return constraint;
 }
 
-export function _createSchemaFromRange(context, range) {
+function _fromObjectSchema(context, uid, propertyRefs) {
+  const keyName = uid.replace('https://', '');
+
+  if (!context.definitions[keyName]) {
+    /* First set to true to prevent recursion */
+    context.definitions[keyName] = true;
+    context.definitions[keyName] = _buildObjectSchema(context, propertyRefs);
+  }
+
+  return { $ref: `#/definitions/${keyName}` };
+}
+
+function _fromLinkedClassRange(context, range) {
+  const rangeClass = context.classCache[range.ref];
+  return _fromObjectSchema(context, rangeClass.uid, rangeClass.propertyRefs);
+}
+
+export function _createSchemaFromRange(context, property) {
+  const { uid, range } = property;
   switch (range.type) {
     case utils.BOOLEAN:
       return { type: 'boolean' };
@@ -114,7 +122,9 @@ export function _createSchemaFromRange(context, range) {
     case utils.NUMBER:
       return _fromNumberRange(range);
     case utils.NESTED_OBJECT:
-      return _fromObjectSchema(context, range.propertyRefs);
+      // console.log(range.propertyRefs);
+      // return;
+      return _fromObjectSchema(context, uid, range.propertyRefs);
     case utils.LINKED_CLASS:
       return _fromLinkedClassRange(context, range);
     default:
@@ -180,7 +190,7 @@ export function generateFromClass(graph, classId, options = {}) {
   /* Merge defaults with top level object contraint */
   const schema = Object.assign({
     $schema: 'http://json-schema.org/draft-04/schema#',
-  }, _fromObjectSchema(context, currentClass.propertyRefs, context.schema));
+  }, _buildObjectSchema(context, currentClass.propertyRefs, context.schema));
 
   /* Add meta and definitions (if there are any) */
   if (Object.keys(context.definitions).length) {
