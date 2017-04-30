@@ -1,201 +1,210 @@
-/* eslint no-use-before-define: ["error", { "functions": false }]*/
+import * as constants from 'schesign-js-graph-utils/dist/constants'
 
-import * as utils from './utils';
+function isNumber (n) {
+  return !isNaN(parseFloat(n)) && isFinite(n)
+}
 
-function _fromStringRange(range) {
-  const constraint = { type: 'string' };
+function isRequiredCardinality (cardinality) {
+  return cardinality.minItems > 0
+}
+
+function isMultipleCardinality (cardinality) {
+  return !isNumber(cardinality.maxItems) || cardinality.maxItems > 1
+}
+
+function _fromStringRange (range) {
+  const constraint = { type: 'string' }
   if (range.format) {
     switch (range.format) {
-      case utils.TEXT_FORMAT_URL:
-        constraint.format = 'uri';
-        break;
-      case utils.TEXT_FORMAT_EMAIL:
-        constraint.format = 'email';
-        break;
-      case utils.TEXT_FORMAT_HOSTNAME:
-        constraint.format = 'hostname';
-        break;
+      case constants.TEXT_URL:
+        constraint.format = 'uri'
+        break
+      case constants.TEXT_EMAIL:
+        constraint.format = 'email'
+        break
+      case constants.TEXT_HOSTNAME:
+        constraint.format = 'hostname'
+        break
       default:
     }
   } else if (range.regex) {
-    constraint.pattern = range.regex;
+    constraint.pattern = range.regex
   }
 
-  if (utils.isNumber(range.minLength)) {
-    constraint.minLength = range.minLength;
+  if (isNumber(range.minLength)) {
+    constraint.minLength = range.minLength
   }
-  if (utils.isNumber(range.maxLength)) {
-    constraint.maxLength = range.maxLength;
+  if (isNumber(range.maxLength)) {
+    constraint.maxLength = range.maxLength
   }
 
-  return constraint;
+  return constraint
 }
 
-function _fromNumberRange(range) {
-  const constraint = {};
+function _fromNumberRange (range) {
+  const constraint = {}
 
   switch (range.format) {
-    case utils.NUMBER_INT:
-    case utils.NUMBER_INT_8:
-    case utils.NUMBER_INT_16:
-    case utils.NUMBER_INT_32:
-    case utils.NUMBER_INT_64:
-      constraint.type = 'integer';
-      break;
+    case constants.NUMBER_INT:
+    case constants.NUMBER_INT_8:
+    case constants.NUMBER_INT_16:
+    case constants.NUMBER_INT_32:
+    case constants.NUMBER_INT_64:
+      constraint.type = 'integer'
+      break
     default:
-      constraint.type = 'number';
+      constraint.type = 'number'
   }
 
-  if (utils.isNumber(range.min)) {
-    constraint.minimum = range.min;
+  if (isNumber(range.min)) {
+    constraint.minimum = range.min
   }
-  if (utils.isNumber(range.max)) {
-    constraint.maximum = range.max;
+  if (isNumber(range.max)) {
+    constraint.maximum = range.max
   }
 
-  return constraint;
+  return constraint
 }
 
-function _fromDateRange(range) {
-  const constraint = { type: 'string' };
-  if (range.format === utils.DATE_DATETIME) {
-    constraint.format = 'date-time';
+function _fromDateRange (range) {
+  const constraint = { type: 'string' }
+  if (range.format === constants.DATE_DATETIME) {
+    constraint.format = 'date-time'
   }
-  return constraint;
+  return constraint
 }
 
-
-export function _buildObjectSchema(context, propertyRefs) {
-  const constraint = { type: 'object' };
-  const required = [];
+export function _buildObjectSchema (context, propertyRefs) {
+  const constraint = { type: 'object' }
+  const required = []
 
   constraint.properties = propertyRefs.reduce((prev, propertyRef) => {
-    const property = context.propertyCache[propertyRef.ref];
-    const { label } = property;
-    const childConstraint = _createSchemaFromRange(context, property);
+    const property = context.propertyCache[propertyRef.ref]
+    const { label } = property
+    const childConstraint = _createSchemaFromRange(context, property)
 
-    if (utils.isRequiredCardinality(propertyRef.cardinality)) {
-      required.push(label);
+    if (isRequiredCardinality(propertyRef.cardinality)) {
+      required.push(label)
     }
 
-    const isArray = utils.isMultipleCardinality(propertyRef.cardinality);
+    const isArray = isMultipleCardinality(propertyRef.cardinality)
     return Object.assign({}, prev, {
-      [label]: isArray ? { type: 'array', items: childConstraint } : childConstraint,
-    });
-  }, {});
+      [label]: isArray ? { type: 'array', items: childConstraint } : childConstraint
+    })
+  }, {})
 
   if (required.length > 0) {
-    constraint.required = required;
+    constraint.required = required
   }
 
-  return constraint;
+  return constraint
 }
 
-function _fromObjectSchema(context, uid, propertyRefs) {
-  const keyName = uid.replace('https://', '');
+function _fromObjectSchema (context, uid, propertyRefs) {
+  const keyName = uid.replace('https://', '')
 
   if (!context.definitions[keyName]) {
     /* First set to true to prevent recursion */
-    context.definitions[keyName] = true;
-    context.definitions[keyName] = _buildObjectSchema(context, propertyRefs);
+    context.definitions[keyName] = true
+    context.definitions[keyName] = _buildObjectSchema(context, propertyRefs)
   }
 
-  return { $ref: `#/definitions/${keyName}` };
+  return { $ref: `#/definitions/${keyName}` }
 }
 
-function _fromLinkedClassRange(context, range) {
-  const rangeClass = context.classCache[range.ref];
-  return _fromObjectSchema(context, rangeClass.uid, rangeClass.propertyRefs);
+function _fromLinkedClassRange (context, range) {
+  const rangeClass = context.classCache[range.ref]
+  return _fromObjectSchema(context, rangeClass.uid, rangeClass.propertyRefs)
 }
 
-export function _createSchemaFromRange(context, property) {
-  const { uid, range } = property;
+export function _createSchemaFromRange (context, property) {
+  const { uid, range } = property
   switch (range.type) {
-    case utils.BOOLEAN:
-      return { type: 'boolean' };
-    case utils.ENUM:
-      return { enum: range.values };
-    case utils.DATE:
-      return _fromDateRange(range);
-    case utils.TEXT:
-      return _fromStringRange(range);
-    case utils.NUMBER:
-      return _fromNumberRange(range);
-    case utils.NESTED_OBJECT:
+    case constants.BOOLEAN:
+      return { type: 'boolean' }
+    case constants.ENUM:
+      return { enum: range.values }
+    case constants.DATE:
+      return _fromDateRange(range)
+    case constants.TEXT:
+      return _fromStringRange(range)
+    case constants.NUMBER:
+      return _fromNumberRange(range)
+    case constants.NESTED_OBJECT:
       // console.log(range.propertyRefs);
       // return;
-      return _fromObjectSchema(context, uid, range.propertyRefs);
-    case utils.LINKED_CLASS:
-      return _fromLinkedClassRange(context, range);
+      return _fromObjectSchema(context, uid, range.propertyRefs)
+    case constants.LINKED_CLASS:
+      return _fromLinkedClassRange(context, range)
     default:
-      throw new Error(`Not expecting type: ${range.type}`);
+      throw new Error(`Not expecting type: ${range.type}`)
   }
 }
 
 /* If there is a property label lower in the hierarchy,
 do not overwrite it from parent with same name */
-function existsInRefs(context, propertyRefs, parentRef) {
+function existsInRefs (context, propertyRefs, parentRef) {
   return propertyRefs.some(ref => {
-    const node = context.propertyCache[ref.ref];
-    const parentNode = context.propertyCache[parentRef.ref];
-    return node.label === parentNode.label;
-  });
+    const node = context.propertyCache[ref.ref]
+    const parentNode = context.propertyCache[parentRef.ref]
+    return node.label === parentNode.label
+  })
 }
 
-export function _flattenHierarchies(context) {
+export function _flattenHierarchies (context) {
   Object.keys(context.classCache).forEach(key => {
-    const classNode = context.classCache[key];
+    const classNode = context.classCache[key]
     const recurseNode = node => {
       if (node.subClassOf) {
-        const parent = context.classCache[node.subClassOf];
+        const parent = context.classCache[node.subClassOf]
         parent.propertyRefs.forEach(parentRef => {
-          const exclude = classNode.excludeParentProperties
-            && classNode.excludeParentProperties.includes(parentRef.ref);
-          const exists = existsInRefs(context, classNode.propertyRefs, parentRef);
+          const exclude = classNode.excludeParentProperties &&
+            classNode.excludeParentProperties.includes(parentRef.ref)
+          const exists = existsInRefs(context, classNode.propertyRefs, parentRef)
           if (!exclude && !exists) {
-            classNode.propertyRefs.push(parentRef);
+            classNode.propertyRefs.push(parentRef)
           }
-        });
-        recurseNode(parent);
+        })
+        recurseNode(parent)
       }
-    };
-    recurseNode(classNode);
-  });
+    }
+    recurseNode(classNode)
+  })
 }
 
 /*
   Entry point. Provide the graph, the classId, and options
 */
-export function generateFromClass(graph, classId, options = {}) {
+export function generateFromClass (graph, classId, options = {}) {
   /* Create a simple context obj to thread through */
   const context = {
     classCache: {},
     propertyCache: {},
-    definitions: {},
-  };
+    definitions: {}
+  }
 
   /* Create a dict lookup for classes and properties for speed and convenience */
   graph.forEach(node => {
     if (node.type === 'Class') {
-      context.classCache[node.uid] = node;
+      context.classCache[node.uid] = node
     } else if (node.type === 'Property') {
-      context.propertyCache[node.uid] = node;
+      context.propertyCache[node.uid] = node
     }
-  });
+  })
 
-  _flattenHierarchies(context);
+  _flattenHierarchies(context)
 
-  const currentClass = context.classCache[classId];
+  const currentClass = context.classCache[classId]
 
   /* Merge defaults with top level object contraint */
   const schema = Object.assign({
-    $schema: 'http://json-schema.org/draft-04/schema#',
-  }, _buildObjectSchema(context, currentClass.propertyRefs, context.schema));
+    $schema: 'http://json-schema.org/draft-04/schema#'
+  }, _buildObjectSchema(context, currentClass.propertyRefs, context.schema))
 
   /* Add meta and definitions (if there are any) */
   if (Object.keys(context.definitions).length) {
-    schema.definitions = context.definitions;
+    schema.definitions = context.definitions
   }
 
-  return schema;
+  return schema
 }
