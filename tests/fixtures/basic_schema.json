@@ -1,0 +1,8 @@
+{
+  "id": "https://wwww.schesign.com/o/tests/basic/master/class/class_a.jsonschema",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "properties": {
+    "property_a": {  "type": "string" }
+  },
+  "type": "object"
+}

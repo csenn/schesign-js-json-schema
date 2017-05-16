@@ -1,0 +1,12 @@
+{
+  "id": "https://wwww.schesign.com/o/tests/inheritance_chain_2/master/class/class5.jsonschema",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "properties": {
+    "a": {  "type": "boolean" },
+    "b": {  "type": "string" },
+    "c": {  "type": "string" },
+    "d": {  "type": "string" },
+    "e": {  "type": "string" }
+  },
+  "type": "object"
+}

@@ -28,10 +28,10 @@
     "chai": "^3.5.0",
     "mocha": "^2.4.5",
     "rimraf": "^2.5.2",
+    "schesign-graph-examples": "0.0.11",
     "standard": "^10.0.2"
   },
   "dependencies": {
-    "schesign-graph-examples": "0.0.1",
     "schesign-js-graph-utils": "0.1.16"
   }
 }

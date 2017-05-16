@@ -1,0 +1,33 @@
+{
+  "id": "https://wwww.schesign.com/o/tests/linked_nodes_2/master/class/class3.jsonschema",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "a": { "type": "string" },
+    "c": { "$ref": "#/definitions/o/tests/linked_nodes_1/0.1.0/class/class2" },
+    "d": { "$ref": "#/definitions/o/tests/linked_nodes_2/master/class/class4" }
+  },
+  "definitions": {
+    "o/tests/linked_nodes_1/0.1.0/class/class2": {
+      "type": "object",
+      "properties": {
+        "a": { "type": "string" },
+        "c": { "$ref": "#/definitions/o/tests/linked_nodes_1/0.1.0/class/class1" }
+      }
+    },
+    "o/tests/linked_nodes_1/0.1.0/class/class1": {
+      "type": "object",
+      "properties": {
+        "a": { "type": "string" },
+        "b": { "$ref": "#/definitions/o/tests/linked_nodes_1/0.1.0/class/class1" }
+      }
+    },
+    "o/tests/linked_nodes_2/master/class/class4": {
+      "type": "object",
+      "properties": {
+        "a": { "type": "string" },
+        "e": { "type": "string" }
+      }
+    }
+  }
+}

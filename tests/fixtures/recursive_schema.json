@@ -1,0 +1,16 @@
+{
+  "id": "https://wwww.schesign.com/o/tests/recursion/master/class/class1.jsonschema",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "property_a": { "$ref": "#/definitions/o/tests/recursion/master/property/property_a" }
+  },
+  "definitions": {
+    "o/tests/recursion/master/property/property_a": {
+      "type": "object",
+      "properties": {
+        "property_a": { "$ref": "#/definitions/o/tests/recursion/master/property/property_a" }
+      }
+    }
+  }
+}

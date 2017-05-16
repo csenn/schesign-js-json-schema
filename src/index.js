@@ -4,14 +4,6 @@ function isNumber (n) {
   return !isNaN(parseFloat(n)) && isFinite(n)
 }
 
-function isRequiredCardinality (cardinality) {
-  return cardinality.minItems > 0
-}
-
-function isMultipleCardinality (cardinality) {
-  return !isNumber(cardinality.maxItems) || cardinality.maxItems > 1
-}
-
 function _fromStringRange (range) {
   const constraint = { type: 'string' }
   if (range.format) {
@@ -74,23 +66,33 @@ function _fromDateRange (range) {
   return constraint
 }
 
-export function _buildObjectSchema (context, propertyRefs) {
+function _buildObjectSchema (context, propertySpecs) {
   const constraint = { type: 'object' }
   const required = []
 
-  constraint.properties = propertyRefs.reduce((prev, propertyRef) => {
-    const property = context.propertyCache[propertyRef.ref]
+  constraint.properties = propertySpecs.reduce((prev, propertySpec) => {
+    const property = context.propertyCache[propertySpec.ref]
     const { label } = property
     const childConstraint = _createSchemaFromRange(context, property)
 
-    if (isRequiredCardinality(propertyRef.cardinality)) {
+    if (propertySpec.required) {
       required.push(label)
     }
 
-    const isArray = isMultipleCardinality(propertyRef.cardinality)
-    return Object.assign({}, prev, {
-      [label]: isArray ? { type: 'array', items: childConstraint } : childConstraint
-    })
+    let result
+    if (propertySpec.array) {
+      result = { type: 'array', items: childConstraint }
+      if (isNumber(propertySpec.minItems)) {
+        result.minItems = propertySpec.minItems
+      }
+      if (isNumber(propertySpec.maxItems)) {
+        result.maxItems = propertySpec.maxItems
+      }
+    } else {
+      result = childConstraint
+    }
+
+    return Object.assign({}, prev, { [label]: result })
   }, {})
 
   if (required.length > 0) {
@@ -100,13 +102,13 @@ export function _buildObjectSchema (context, propertyRefs) {
   return constraint
 }
 
-function _fromObjectSchema (context, uid, propertyRefs) {
+function _fromObjectSchema (context, uid, propertySpecs) {
   const keyName = uid.replace('https://', '')
 
   if (!context.definitions[keyName]) {
     /* First set to true to prevent recursion */
     context.definitions[keyName] = true
-    context.definitions[keyName] = _buildObjectSchema(context, propertyRefs)
+    context.definitions[keyName] = _buildObjectSchema(context, propertySpecs)
   }
 
   return { $ref: `#/definitions/${keyName}` }
@@ -114,7 +116,7 @@ function _fromObjectSchema (context, uid, propertyRefs) {
 
 function _fromLinkedClassRange (context, range) {
   const rangeClass = context.classCache[range.ref]
-  return _fromObjectSchema(context, rangeClass.uid, rangeClass.propertyRefs)
+  return _fromObjectSchema(context, rangeClass.uid, rangeClass.propertySpecs)
 }
 
 export function _createSchemaFromRange (context, property) {
@@ -131,9 +133,9 @@ export function _createSchemaFromRange (context, property) {
     case constants.NUMBER:
       return _fromNumberRange(range)
     case constants.NESTED_OBJECT:
-      // console.log(range.propertyRefs);
+      // console.log(range.propertySpecs);
       // return;
-      return _fromObjectSchema(context, uid, range.propertyRefs)
+      return _fromObjectSchema(context, uid, range.propertySpecs)
     case constants.LINKED_CLASS:
       return _fromLinkedClassRange(context, range)
     default:
@@ -143,8 +145,8 @@ export function _createSchemaFromRange (context, property) {
 
 /* If there is a property label lower in the hierarchy,
 do not overwrite it from parent with same name */
-function existsInRefs (context, propertyRefs, parentRef) {
-  return propertyRefs.some(ref => {
+function existsInRefs (context, propertySpecs, parentRef) {
+  return propertySpecs.some(ref => {
     const node = context.propertyCache[ref.ref]
     const parentNode = context.propertyCache[parentRef.ref]
     return node.label === parentNode.label
@@ -154,21 +156,26 @@ function existsInRefs (context, propertyRefs, parentRef) {
 export function _flattenHierarchies (context) {
   Object.keys(context.classCache).forEach(key => {
     const classNode = context.classCache[key]
+    const excluded = []
+
+    // classNode.excludeParentProperties || []
     const recurseNode = node => {
       if (node.subClassOf) {
         const parent = context.classCache[node.subClassOf]
-        parent.propertyRefs.forEach(parentRef => {
-          const exclude = classNode.excludeParentProperties &&
-            classNode.excludeParentProperties.includes(parentRef.ref)
-          const exists = existsInRefs(context, classNode.propertyRefs, parentRef)
-          if (!exclude && !exists) {
-            classNode.propertyRefs.push(parentRef)
+        parent.propertySpecs.forEach(parentRef => {
+          if (node.excludeParentProperties) {
+            excluded.push(...node.excludeParentProperties)
+          }
+          const exists = existsInRefs(context, classNode.propertySpecs, parentRef)
+          if (!exists) {
+            classNode.propertySpecs.push(parentRef)
           }
         })
         recurseNode(parent)
       }
     }
     recurseNode(classNode)
+    classNode.propertySpecs = classNode.propertySpecs.filter(spec => excluded.indexOf(spec.ref) === -1)
   })
 }
 
@@ -195,11 +202,15 @@ export function generateFromClass (graph, classId, options = {}) {
   _flattenHierarchies(context)
 
   const currentClass = context.classCache[classId]
+  if (!currentClass) {
+    throw new Error(`Could not find class ${classId} in graph`)
+  }
 
   /* Merge defaults with top level object contraint */
   const schema = Object.assign({
+    id: `https://wwww.schesign.com/${classId}.jsonschema`,
     $schema: 'http://json-schema.org/draft-04/schema#'
-  }, _buildObjectSchema(context, currentClass.propertyRefs, context.schema))
+  }, _buildObjectSchema(context, currentClass.propertySpecs, context.schema))
 
   /* Add meta and definitions (if there are any) */
   if (Object.keys(context.definitions).length) {
