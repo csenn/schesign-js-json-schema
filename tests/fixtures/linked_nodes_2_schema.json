@@ -3,30 +3,42 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "properties": {
-    "a": { "type": "string" },
-    "c": { "$ref": "#/definitions/o/tests/linked_nodes_1/0.1.0/class/class2" },
+    "a": { "$ref": "#/definitions/o/tests/linked_nodes_1/0.1.0/class/class1" },
+    "b": { "$ref": "#/definitions/o/tests/linked_nodes_1/0.1.0/property/b" },
+    "c": { "$ref": "#/definitions/o/tests/linked_nodes_1/0.1.0/class/class1" },
     "d": { "$ref": "#/definitions/o/tests/linked_nodes_2/master/class/class4" }
   },
   "definitions": {
-    "o/tests/linked_nodes_1/0.1.0/class/class2": {
-      "type": "object",
-      "properties": {
-        "a": { "type": "string" },
-        "c": { "$ref": "#/definitions/o/tests/linked_nodes_1/0.1.0/class/class1" }
-      }
-    },
     "o/tests/linked_nodes_1/0.1.0/class/class1": {
       "type": "object",
       "properties": {
-        "a": { "type": "string" },
-        "b": { "$ref": "#/definitions/o/tests/linked_nodes_1/0.1.0/class/class1" }
+        "a": { "$ref": "#/definitions/o/tests/linked_nodes_1/0.1.0/class/class1" },
+        "b": { "$ref": "#/definitions/o/tests/linked_nodes_1/0.1.0/property/b" }
+      }
+    },
+    "o/tests/linked_nodes_1/0.1.0/property/b": {
+      "type": "object",
+      "properties": {
+        "e": { "$ref": "#/definitions/o/tests/linked_nodes_1/0.1.0/class/class2" }
+      }
+    },
+    "o/tests/linked_nodes_1/0.1.0/class/class2": {
+      "type": "object",
+      "properties": {
+        "a": { "$ref": "#/definitions/o/tests/linked_nodes_1/0.1.0/class/class1" },
+        "c": { "type": "string" }
+      }
+    },
+    "o/tests/linked_nodes_1/0.1.0/class/class3": {
+      "type": "object",
+      "properties": {
+        "d": { "type": "string" }
       }
     },
     "o/tests/linked_nodes_2/master/class/class4": {
       "type": "object",
       "properties": {
-        "a": { "type": "string" },
-        "e": { "type": "string" }
+        "f": { "$ref": "#/definitions/o/tests/linked_nodes_1/0.1.0/class/class3" }
       }
     }
   }

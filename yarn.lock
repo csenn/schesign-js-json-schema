@@ -2282,9 +2282,9 @@ schesign-graph-examples@0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/schesign-graph-examples/-/schesign-graph-examples-0.0.1.tgz#8a9be72ee9af5707eb6a9f7733cfd7be1ddce298"
 
-schesign-graph-examples@0.0.11:
-  version "0.0.11"
-  resolved "https://registry.yarnpkg.com/schesign-graph-examples/-/schesign-graph-examples-0.0.11.tgz#cd0e3aaa7181e65074fedabde0ac4f42d2aca487"
+schesign-graph-examples@0.0.12:
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/schesign-graph-examples/-/schesign-graph-examples-0.0.12.tgz#e11255a19d11aed22b6d67a0d820a4dd6b756504"
 
 schesign-js-graph-utils@0.1.16:
   version "0.1.16"
