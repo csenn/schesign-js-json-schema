@@ -17,11 +17,11 @@
     },
     "a3": {
       "type": "array",
-      "minItems": 1,
-      "maxItems": 10,
       "items": {
         "type": "boolean"
-      }
+      },
+      "minItems": 1,
+      "maxItems": 10
     },
     "a4": {
       "type": "boolean"
@@ -104,28 +104,28 @@
       "type": "string"
     },
     "f": {
-      "$ref": "#/definitions/o/tests/property_variations/master/property/f"
+      "$ref": "#/definitions/o*tests*property_variations*master*property*f"
     },
     "g": {
-      "$ref": "#/definitions/o/tests/property_variations/master/class/class2"
+      "$ref": "#/definitions/o*tests*property_variations*master*class*class2"
     }
   },
   "required": [
     "a1"
   ],
   "definitions": {
-    "o/tests/property_variations/master/property/f": {
+    "o*tests*property_variations*master*property*f": {
       "type": "object",
       "properties": {
         "a": {
           "type": "boolean"
         },
         "f1": {
-          "$ref": "#/definitions/o/tests/property_variations/master/property/f1"
+          "$ref": "#/definitions/o*tests*property_variations*master*property*f1"
         }
       }
     },
-    "o/tests/property_variations/master/property/f1": {
+    "o*tests*property_variations*master*property*f1": {
       "type": "object",
       "properties": {
         "a": {
@@ -133,7 +133,7 @@
         }
       }
     },
-    "o/tests/property_variations/master/class/class2": {
+    "o*tests*property_variations*master*class*class2": {
       "type": "object",
       "properties": {}
     }

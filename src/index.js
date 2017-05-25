@@ -103,7 +103,7 @@ function _buildObjectSchema (context, propertySpecs) {
 }
 
 function _fromObjectSchema (context, uid, propertySpecs) {
-  const keyName = uid.replace('https://', '')
+  const keyName = uid.replace(/\//g, '*')
 
   if (!context.definitions[keyName]) {
     /* First set to true to prevent recursion */

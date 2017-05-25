@@ -3,13 +3,17 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "properties": {
-    "property_a": { "$ref": "#/definitions/o/tests/recursion/master/property/property_a" }
+    "property_a": {
+      "$ref": "#/definitions/o*tests*recursion*master*property*property_a"
+    }
   },
   "definitions": {
-    "o/tests/recursion/master/property/property_a": {
+    "o*tests*recursion*master*property*property_a": {
       "type": "object",
       "properties": {
-        "property_a": { "$ref": "#/definitions/o/tests/recursion/master/property/property_a" }
+        "property_a": {
+          "$ref": "#/definitions/o*tests*recursion*master*property*property_a"
+        }
       }
     }
   }
